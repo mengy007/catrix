@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <sys/ioctl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -261,7 +262,10 @@ int main(void)
   atexit(cleanup);
   signal(SIGINT, handle_exit_signal);
   signal(SIGTERM, handle_exit_signal);
+
+#ifdef SIGWINCH
   signal(SIGWINCH, handle_winch);
+#endif
 
   time_t t;
   srand((unsigned)time(&t));
