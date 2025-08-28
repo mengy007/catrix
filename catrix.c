@@ -7,6 +7,11 @@
 #include <signal.h>
 #include <string.h>
 
+/* time constants */
+#define NSEC_PER_SEC 1000000000ull
+#define TARGET_FPS 60u
+#define FRAME_NS (NSEC_PER_SEC / TARGET_FPS)
+
 const useconds_t DELAY = 12000;
 const char CHARS[] = ":-=0123456789!@#$%&#$[]|<>?ODUCQAB";
 
@@ -23,8 +28,8 @@ static int COLS = 0, ROWS = 0;
 static struct blue_pill *matrix = NULL;
 static volatile sig_atomic_t resize_pending = 0;
 static volatile sig_atomic_t exit_pending = 0;
-const double TARGET_FPS = 60.0;
-const uint64_t FRAME_NS = (uint64_t)(1e9 / TARGET_FPS);
+// const double TARGET_FPS = 60.0;
+// const uint64_t FRAME_NS = (uint64_t)(1e9 / TARGET_FPS);
 
 /* Utils */
 static inline int chars_len(void) { return (int)(sizeof(CHARS) - 1); }
@@ -76,7 +81,7 @@ void cleanup(void)
     matrix = NULL;
   }
   /* SHOW CURSOR */
-  printf("\e[?25h");
+  printf("\x1b[?25h");
   fflush(stdout);
 }
 
@@ -177,19 +182,19 @@ void print_matrix(void)
     {
       if (r - 3 > matrix[c].cycle - matrix[c].lifespan && r < matrix[c].cycle - 2)
       {
-        printf("\e[38;2;10;255;65m%c \033[0m", matrix[c].rsi[r]);
+        printf("\x1b[38;2;10;255;65m%c \033[0m", matrix[c].rsi[r]);
       }
       else if (r - 1 > matrix[c].cycle - matrix[c].lifespan && r < matrix[c].cycle - 2)
       {
-        printf("\e[38;2;10;143;17m%c \033[0m", matrix[c].rsi[r]);
+        printf("\x1b[38;2;10;143;17m%c \033[0m", matrix[c].rsi[r]);
       }
       else if (r > matrix[c].cycle - matrix[c].lifespan && r < matrix[c].cycle - 2)
       {
-        printf("\e[38;2;10;59;0m%c \033[0m", matrix[c].rsi[r]);
+        printf("\x1b[38;2;10;59;0m%c \033[0m", matrix[c].rsi[r]);
       }
       else if (matrix[c].cycle > r + 1 && matrix[c].cycle < r + 2)
       {
-        printf("\e[38;2;220;255;220m%c \033[0m", matrix[c].rsi[r]);
+        printf("\x1b[38;2;220;255;220m%c \033[0m", matrix[c].rsi[r]);
       }
       else if (matrix[c].cycle > r && matrix[c].cycle < r + 1)
       {
@@ -279,7 +284,7 @@ int main(void)
   }
 
   /* HIDE CURSOR */
-  printf("\e[?25l");
+  printf("\x1b[?25l");
   fflush(stdout);
 
   for (;;)
