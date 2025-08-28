@@ -23,6 +23,7 @@ struct blue_pill
   float speed;
   int lifespan; /* trail length */
   float cycle;  /* head position */
+  int bold;
 };
 
 /* Globals */
@@ -122,6 +123,14 @@ static struct blue_pill *alloc_matrix(int cols, int rows)
     for (int r = 0; r < rows; r++)
     {
       m[c].rsi[r] = CHARS[rand() % chars_len()];
+      if (rand() % 100 > 60)
+      {
+        m[c].bold = 1;
+      }
+      else
+      {
+        m[c].bold = 0;
+      }
     }
   }
   return m;
@@ -185,7 +194,14 @@ static void print_matrix(void)
     {
       if (r - 3 > matrix[c].cycle - matrix[c].lifespan && r < matrix[c].cycle - 2)
       {
-        printf("\x1b[38;2;10;255;65m%c \033[0m", matrix[c].rsi[r]);
+        if (matrix[c].bold > 0)
+        {
+          printf("\x1b[38;2;60;255;95m%c \033[0m", matrix[c].rsi[r]);
+        }
+        else
+        {
+          printf("\x1b[38;2;10;200;65m%c \033[0m", matrix[c].rsi[r]);
+        }
       }
       else if (r - 1 > matrix[c].cycle - matrix[c].lifespan && r < matrix[c].cycle - 2)
       {
