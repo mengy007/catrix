@@ -21,7 +21,7 @@ BIN      := $(BUILD)/$(APP)
 # ---- toolchain & flags ----
 CC       := cc
 # feature test macro for POSIX APIs (clock_gettime, nanosleep, etc.)
-BASE_DEFS := -D_POSIX_C_SOURCE=200809L
+BASE_DEFS := -D_DARWIN_C_SOURCE -D_POSIX_C_SOURCE=200809L
 WARN     := -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wmissing-prototypes
 OPT_REL  := -O3
 OPT_DBG  := -O0 -g3

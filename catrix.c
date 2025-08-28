@@ -1,3 +1,5 @@
+#define _DARWIN_C_SOURCE 1
+
 #include <stdint.h>
 #include <sys/ioctl.h>
 #include <stdio.h>
@@ -86,13 +88,11 @@ static void cleanup(void)
 }
 
 /* Signal handlers (async-safe: set flags only) */
-#ifdef SIGWINCH
 static void handle_winch(int sig)
 {
   (void)sig;
   resize_pending = 1;
 }
-#endif
 
 static void handle_exit_signal(int sig)
 {
