@@ -53,7 +53,7 @@ static inline void pick_lifespan_for_column(struct blue_pill *col, int rows)
 }
 
 /* Terminal size */
-void get_term_size_now(int *out_cols, int *out_rows)
+static void get_term_size_now(int *out_cols, int *out_rows)
 {
   struct winsize w;
   if (ioctl(STDIN_FILENO, TIOCGWINSZ, &w) == -1 || w.ws_col == 0 || w.ws_row == 0)
@@ -69,7 +69,7 @@ void get_term_size_now(int *out_cols, int *out_rows)
 }
 
 /* Cleanup */
-void cleanup(void)
+static void cleanup(void)
 {
   if (matrix)
   {
@@ -86,19 +86,22 @@ void cleanup(void)
 }
 
 /* Signal handlers (async-safe: set flags only) */
-void handle_winch(int sig)
+#ifdef SIGWINCH
+static void handle_winch(int sig)
 {
   (void)sig;
   resize_pending = 1;
 }
-void handle_exit_signal(int sig)
+#endif
+
+static void handle_exit_signal(int sig)
 {
   (void)sig;
   exit_pending = 1;
 }
 
 /* Allocate a fresh matrix */
-struct blue_pill *alloc_matrix(int cols, int rows)
+static struct blue_pill *alloc_matrix(int cols, int rows)
 {
   struct blue_pill *m = (struct blue_pill *)malloc((size_t)cols * sizeof(*m));
   if (!m)
@@ -125,7 +128,7 @@ struct blue_pill *alloc_matrix(int cols, int rows)
 }
 
 /* Resize safely at a sync point */
-int apply_resize_if_needed(void)
+static int apply_resize_if_needed(void)
 {
   if (!resize_pending)
     return 0;
@@ -162,19 +165,19 @@ int apply_resize_if_needed(void)
 }
 
 /* Initial world */
-int init_world(void)
+static int init_world(void)
 {
   get_term_size_now(&COLS, &ROWS);
   matrix = alloc_matrix(COLS, ROWS);
   return matrix ? 0 : -1;
 }
 
-void clear_screen(void)
+static void clear_screen(void)
 {
   printf("\x1b[H");
 }
 
-void print_matrix(void)
+static void print_matrix(void)
 {
   for (int r = 0; r < ROWS; r++)
   {
@@ -212,7 +215,7 @@ void print_matrix(void)
   }
 }
 
-void simulate_matrix(void)
+static void simulate_matrix(void)
 {
   for (int c = 0; c < COLS; c++)
   {
